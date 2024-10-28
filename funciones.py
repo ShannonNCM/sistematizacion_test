@@ -7,6 +7,7 @@ import numpy as np
 import string
 from collections import Counter
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # modulo NLP en español
 nlp = spacy.load('es_core_news_md')
@@ -81,7 +82,7 @@ def results(df):
     return grupo
 
 #funcion para graficar
-def graf_rad(x):
+def graf_rad(x, name):
     categories = x.columns
     values = x.iloc[-1]
     
@@ -100,4 +101,27 @@ def graf_rad(x):
     ax.set_xticklabels(categories[:-1], fontsize=5)
     ax.set_theta_zero_location('N')
     
+    plt.savefig(name)
+    plt.close()
+    
     return fig, ax
+
+#funcion para hacer el histograma
+def histograma(x, name):
+    fig = x.iloc[-1].T.plot(kind='barh', legend=False, figsize=(10, 8), color='skyblue')
+    plt.title("Resultados generales")
+    
+    plt.savefig(name)
+    
+    return fig
+
+#funcion para graficar el mapa de calor
+def heatmap(x, name):
+    fig = plt.figure(figsize=(8,6))
+    indx_labels = ['P1', 'P2', 'P3', 'Total']
+    sns.heatmap(x, annot=True, cmap='YlGnBu', cbar=True, yticklabels=indx_labels) #YlGnBu
+    
+    plt.savefig(name)
+    plt.close(fig)
+    
+    return fig
