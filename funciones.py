@@ -8,6 +8,7 @@ import string
 from collections import Counter
 import matplotlib.pyplot as plt
 import seaborn as sns
+import textwrap
 
 # modulo NLP en español
 nlp = spacy.load('es_core_news_md')
@@ -81,14 +82,23 @@ def results(df):
     
     return grupo
 
+#_______________________________________________________________________________________________________________
+# FUNCIONES PARA GRAFICAR
+
 #funcion para graficar
-def graf_rad(x, name):
+def graf_rad(x, name, wrap_width =10):
     categories = x.columns
     values = x.iloc[-1]
+    
+    non_zero_mask = values != 0
+    values = values[non_zero_mask]
+    categories = categories[non_zero_mask]
     
     # se cierra la grafica repitiendo el primer valor
     values = np.append(values, values[0])
     categories = np.append(categories, categories[0])
+    
+    wrapped_categories = [wrap_text(cat, wrap_width) for cat in categories]
     
     angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=True)[::-1]
     
@@ -98,7 +108,7 @@ def graf_rad(x, name):
     ax.fill(angles, values, 'b', alpha=0.3)
     
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(categories[:-1], fontsize=5)
+    ax.set_xticklabels(wrapped_categories[:-1], fontsize=8)
     ax.set_theta_zero_location('N')
     
     plt.savefig(name)
@@ -111,6 +121,7 @@ def histograma(x, name):
     fig = x.iloc[-1].T.plot(kind='barh', legend=False, figsize=(10, 8), color='skyblue')
     plt.title("Resultados generales")
     
+    plt.tight_layout()
     plt.savefig(name)
     
     return fig
@@ -121,7 +132,29 @@ def heatmap(x, name):
     indx_labels = ['P1', 'P2', 'P3', 'Total']
     sns.heatmap(x, annot=True, cmap='YlGnBu', cbar=True, yticklabels=indx_labels) #YlGnBu
     
+    plt.tight_layout()
     plt.savefig(name)
     plt.close(fig)
     
     return fig
+
+
+# funcion para mejorar la forma en la que se hace el wrap de las palabras de las graficas
+def wrap_text(text, width):
+    """Wrap text to a specified width without splitting words."""
+    wrapped_lines = []
+    words = text.split()
+    current_line = ""
+
+    for word in words:
+        # Check if adding the next word exceeds the width
+        if len(current_line) + len(word) + 1 <= width:
+            current_line += (word + " ")
+        else:
+            wrapped_lines.append(current_line.strip())
+            current_line = word + " "
+    
+    if current_line:
+        wrapped_lines.append(current_line.strip())
+
+    return "\n".join(wrapped_lines)
