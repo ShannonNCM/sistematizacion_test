@@ -141,13 +141,11 @@ def heatmap(x, name):
 
 # funcion para mejorar la forma en la que se hace el wrap de las palabras de las graficas
 def wrap_text(text, width):
-    """Wrap text to a specified width without splitting words."""
     wrapped_lines = []
     words = text.split()
     current_line = ""
 
     for word in words:
-        # Check if adding the next word exceeds the width
         if len(current_line) + len(word) + 1 <= width:
             current_line += (word + " ")
         else:
